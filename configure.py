@@ -4,10 +4,12 @@ from ambuild2 import run
 
 # Simple extensions do not need to modify this file.
 
-builder = run.BuildParser(sourcePath = sys.path[0], api='2.2')
+builder = run.BuildParser(sourcePath=sys.path[0], api='2.2')
 
 builder.options.add_argument('--hl2sdk-root', type=str, dest='hl2sdk_root', default=None,
-		                   help='Root search folder for HL2SDKs')
+                       help='Root search folder for HL2SDKs')
+builder.options.add_argument('--hl2sdk-manifest-path', type=str, dest='hl2sdk_manifest', default=None,
+                       help='Path to HL2SDK Manifests')
 builder.options.add_argument('--mms-path', type=str, dest='mms_path', default=None,
                        help='Path to Metamod:Source')
 builder.options.add_argument('--sm-path', type=str, dest='sm_path', default=None,
@@ -20,6 +22,6 @@ builder.options.add_argument('-s', '--sdks', default='all', dest='sdks',
                        help='Build against specified SDKs; valid args are "all", "present", or '
                             'comma-delimited list of engine names (default: %default)')
 builder.options.add_argument('--targets', type=str, dest='targets', default=None,
-                          help="Override the target architecture (use commas to separate multiple targets).")
+                       help="Override the target architecture (use commas to separate multiple targets).")
 
 builder.Configure()
