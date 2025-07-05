@@ -101,6 +101,12 @@ jobs:
             git clone hl2sdk-proxy-repo -b $sdk hl2sdk-$sdk
           done
 
+      - name: Fetch SDK Manifests
+        uses: actions/checkout@v2
+        with:
+          repository: alliedmodders/hl2sdk-manifests
+          path: hl2sdk-manifests
+
       - name: Getting own repository
         uses: actions/checkout@v4
         with:
@@ -112,7 +118,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          python ../configure.py --enable-optimize --sdks=tf2 --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_version }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_version }}"
+          python ../configure.py --enable-optimize --sdks=tf2 --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_version }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_version }}" --hl2sdk-manifest-path="${{ github.workspace }}/hl2sdk-manifests"
           ambuild
 
       - name: Uploading debug symbols
