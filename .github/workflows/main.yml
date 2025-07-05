@@ -19,7 +19,7 @@ on:
       - README.md
   workflow_dispatch:
   schedule:
-    - cron: "30 03 01 */3 *" # Artifacts expire every 3 months
+    - cron: "30 03 01 */3 *"
 
 jobs:
   build:
@@ -29,6 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - ubuntu-latest
           - windows-latest
         sm_version:
           - "1.12"
@@ -37,7 +38,11 @@ jobs:
             sm_branch: "1.12-dev"
             meta_version: "1.12"
             meta_branch: "1.12-dev"
-            os: windows-latest
+
+          - os: ubuntu-latest
+            os_short: linux
+
+          - os: windows-latest
             os_short: win
 
     steps:
@@ -55,18 +60,26 @@ jobs:
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      - name: Install (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y clang g++-multilib
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+
       - name: Add msbuild to PATH (Windows)
+        if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v2
 
       - name: Install (Windows)
+        if: runner.os == 'Windows'
         shell: cmd
         run: |
-          :: See https://github.com/microsoft/vswhere/wiki/Find-VC
           for /f "usebackq delims=*" %%i in (`vswhere -latest -property installationPath`) do (
-            call "%%i"\Common7\Tools\vsdevcmd.bat -arch=x86 -host_arch=x64
+            call "%%i\common7\tools\vsdevcmd.bat" -arch=x86 -host_arch=x64
           )
-
-          :: Loop over all environment variables and make them global.
           for /f "delims== tokens=1,2" %%a in ('set') do (
             echo>>"%GITHUB_ENV%" %%a=%%b
           )
@@ -96,13 +109,12 @@ jobs:
         run: |
           git clone --mirror https://github.com/alliedmodders/hl2sdk hl2sdk-proxy-repo
           sdks=(csgo tf2 css hl2dm dods l4d2 l4d)
-          for sdk in "${sdks[@]}"
-          do
+          for sdk in "${sdks[@]}"; do
             git clone hl2sdk-proxy-repo -b $sdk hl2sdk-$sdk
           done
 
-      - name: Fetch SDK Manifests
-        uses: actions/checkout@v2
+      - name: Getting SDK Manifests
+        uses: actions/checkout@v4
         with:
           repository: alliedmodders/hl2sdk-manifests
           path: hl2sdk-manifests
@@ -118,14 +130,19 @@ jobs:
         run: |
           mkdir build
           cd build
-          python ../configure.py --enable-optimize --sdks=tf2 --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_version }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_version }}" --hl2sdk-manifest-path="${{ github.workspace }}/hl2sdk-manifests"
+          python ../configure.py \
+            --enable-optimize \
+            --sdks=present \
+            --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_version }}" \
+            --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_version }}" \
+            --hl2sdk-manifest-path="${{ github.workspace }}/hl2sdk-manifests"
           ambuild
 
       - name: Uploading debug symbols
         working-directory: sourcetvmanager/build
         shell: bash
         run: |
-          for f in $(find sourcetvmanager.ext.2.* -type f -print | grep \/sourcetvmanager\.ext\.2\.*\.); do
+          for f in $(find sourcetvmanager.ext.2.* -type f -print | grep /sourcetvmanager\.ext\.2\.*\.); do
             if ! [[ $f == *.so || $f == *.pdb ]]; then
               continue
             fi
@@ -151,15 +168,12 @@ jobs:
 
       - name: Package
         run: |
-          version=`echo $GITHUB_REF | sed "s/refs\/tags\///"`
-
+          version=$(echo $GITHUB_REF | sed "s/refs\/tags\///")
           ls -Rall
-
-          for folder in sourcetvmanager*
-          do
+          for folder in sourcetvmanager*; do
             echo "Processing folder: $folder"
             cd $folder
-            tar -czf ../${folder}-${version}.tar.gz -T <(\ls -1)
+            tar -czf ../${folder}-${version}.tar.gz -T <(ls -1)
             cd -
           done
 
