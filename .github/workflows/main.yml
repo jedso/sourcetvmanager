@@ -130,12 +130,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          python ../configure.py \
-            --enable-optimize \
-            --sdks=present \
-            --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_version }}" \
-            --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_version }}" \
-            --hl2sdk-manifest-path="${{ github.workspace }}/hl2sdk-manifests"
+          python ../configure.py --enable-optimize --sdks=tf2 --sm-path="${{ github.workspace }}/sourcemod-${{ matrix.sm_version }}" --mms-path="${{ github.workspace }}/metamod-${{ matrix.meta_version }}" --hl2sdk-manifest-path="${{ github.workspace }}/hl2sdk-manifests"
           ambuild
 
       - name: Uploading debug symbols
