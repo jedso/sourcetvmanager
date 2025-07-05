@@ -62,8 +62,8 @@ jobs:
 
           - sm_version: "1.12"
             sm_branch: "1.12-dev"
-            meta_version: "1.11"
-            meta_branch: "1.11-dev"
+            meta_version: "1.12"
+            meta_branch: "1.12-dev"
 
           - os: ubuntu-latest
             os_short: linux
