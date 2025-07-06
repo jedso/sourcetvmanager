@@ -397,14 +397,14 @@ class ExtensionConfig(object):
 
     if compiler.target.platform == 'linux':
       if compiler.target.arch == 'x86_64':
-        lib_folder = os.path.join(sdk.path, 'lib', 'linux64')
+        lib_folder = os.path.join(sdk.path, 'lib', 'public', 'linux64')
       else:
-        lib_folder = os.path.join(sdk.path, 'lib', 'linux')
+        lib_folder = os.path.join(sdk.path, 'lib', 'public', 'linux')
     elif compiler.target.platform == 'windows':
       if compiler.target.arch == 'x86_64':
-        lib_folder = os.path.join(sdk.path, 'lib', 'x64')
+        lib_folder = os.path.join(sdk.path, 'lib', 'public', 'x64')
       else:
-        lib_folder = os.path.join(sdk.path, 'lib', 'x86')
+        lib_folder = os.path.join(sdk.path, 'lib', 'public', 'x86')
     else:
       raise Exception('Unsupported platform for HL2 extension')
 
