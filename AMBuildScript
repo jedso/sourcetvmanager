@@ -411,29 +411,29 @@ class ExtensionConfig(object):
     # link
     #
 
-if compiler.target.platform == 'linux':
-    compiler.cflags += ['-Wno-unknown-pragmas']  # optional, useful for ignoring MSVC pragmas
+    if compiler.target.platform == 'linux':
+        compiler.cflags += ['-Wno-unknown-pragmas']  # optional, useful for ignoring MSVC pragmas
 
-    if compiler.target.arch == 'x86_64':
-        compiler.postlink += [
-            os.path.join(lib_folder, 'tier1.a'),
-            os.path.join(lib_folder, 'mathlib.a')
-        ]
-    else:
-        compiler.postlink += [
-            os.path.join(lib_folder, 'tier1_i486.a'),
-            os.path.join(lib_folder, 'mathlib_i486.a')
-        ]
+        if compiler.target.arch == 'x86_64':
+            compiler.postlink += [
+                os.path.join(lib_folder, 'tier1.a'),
+                os.path.join(lib_folder, 'mathlib.a')
+            ]
+        else:
+            compiler.postlink += [
+                os.path.join(lib_folder, 'tier1_i486.a'),
+                os.path.join(lib_folder, 'mathlib_i486.a')
+            ]
 
-    if sdk.name in ['blade', 'insurgency', 'csgo', 'dota']:
-        compiler.postlink += [os.path.join(lib_folder, 'interfaces.a')]
+        if sdk.name in ['blade', 'insurgency', 'csgo', 'dota']:
+            compiler.postlink += [os.path.join(lib_folder, 'interfaces.a')]
 
-elif compiler.target.platform == 'windows':
-    libs = ['tier0', 'tier1', 'vstdlib', 'mathlib']
-    if sdk.name in ['swarm', 'blade', 'insurgency', 'csgo', 'dota']:
-        libs.append('interfaces')
-    for lib in libs:
-        compiler.linkflags.append(os.path.join(lib_folder, lib + '.lib'))
+    elif compiler.target.platform == 'windows':
+        libs = ['tier0', 'tier1', 'vstdlib', 'mathlib']
+        if sdk.name in ['swarm', 'blade', 'insurgency', 'csgo', 'dota']:
+            libs.append('interfaces')
+        for lib in libs:
+            compiler.linkflags.append(os.path.join(lib_folder, lib + '.lib'))
 
     #
     # dynamic libraries symlink
