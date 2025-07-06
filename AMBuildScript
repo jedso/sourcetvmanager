@@ -304,7 +304,7 @@ class ExtensionConfig(object):
     cxx.cflags += ['/Oy-']
 
   def configure_linux(self, cxx):
-    cxx.defines += ['_LINUX', 'POSIX']
+    cxx.defines += ['_LINUX', 'POSIX', 'LINUX']
     cxx.linkflags += ['-Wl,--exclude-libs,ALL', '-lm']
     if cxx.family == 'gcc':
       cxx.linkflags += ['-static-libgcc']
@@ -413,7 +413,6 @@ class ExtensionConfig(object):
     #
 
     if compiler.target.platform == 'linux':
-      compiler.defines += ['PLATFORM_POSIX', 'POSIX']
       compiler.cflags += ['-Wno-unknown-pragmas']  # optional, useful for ignoring MSVC pragmas
 
       compiler.postlink += [
